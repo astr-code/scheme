@@ -3,11 +3,17 @@ from fractions import Fraction
 import taylor as ty
 import spectra as sp
 
-class fdm_compact_tridiagonal(object):
+class fdm_scheme(object):
     
-    lhs_stencil   = np.array([-1, 0, 1])
+    def __init__(self,first_node,last_node,coefficient_lhs,coefficient_rhs,form):
 
-    def __init__(self,first_node,last_node,coefficient_lhs,coefficient_rhs):
+        self.form = form
+
+        if self.form == 'compact':
+            self.lhs_stencil   = np.array([-1, 0, 1])
+        elif self.form == 'explicit':
+            self.lhs_stencil   = np.array([0])
+
         self.first_node        = first_node
         self.last_node         = last_node
         self.length_of_stencil = last_node-first_node+1
@@ -15,6 +21,7 @@ class fdm_compact_tridiagonal(object):
         self.coefficient_rhs   = coefficient_rhs
 
         self.rhs_stencil = np.zeros(self.length_of_stencil,dtype=np.int32)
+
         for i in range(first_node,last_node+1):
             self.rhs_stencil[i-first_node] = i
         
@@ -29,7 +36,12 @@ class fdm_compact_tridiagonal(object):
         print('           RHS stencil:',self.rhs_stencil)
         print('       RHS coefficient:',self.coefficient_rhs)
         print('     Order of accuracy:',self.order_of_accuracy)
-        print('      format of scheme:',"{}{}{}{}".format(Fraction(self.coefficient_lhs[0]).limit_denominator(),'*df(i-1) + df(i) + ',Fraction(self.coefficient_lhs[2]).limit_denominator(),'*df(i+1) = '))
+
+        if self.form == 'compact':
+            print('      format of scheme:',"{}{}{}{}".format(Fraction(self.coefficient_lhs[0]).limit_denominator(),'*df(i-1) + df(i) + ',Fraction(self.coefficient_lhs[2]).limit_denominator(),'*df(i+1) = ')) 
+        elif self.form == 'explicit':
+            print('      format of scheme: df(i)=') 
+
         j = -1
         for i in range(self.first_node,self.last_node+1):
             j = j+1

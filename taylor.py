@@ -31,20 +31,20 @@ def truncation_error_analysis(lhs_stencil,lhs_coefficient,rhs_stencil,rhs_coeffi
 	
     coef = np.zeros(max_order_of_accuracy+1)
 	
-    # left hand side term
+    # right hand side term
     n = -1   
     for i in range(first_node,last_node+1):
         c = TaylorSeriesCoef(i,max_order_of_accuracy ,'f')
         n = n +1
         coef = coef + c*rhs_coefficient[n]
 	# 
-	# right hand side term
+	# left hand side term
     n = -1   
-    for i in range(-1,2):
+    for i in range(lhs_stencil[0],lhs_stencil[-1]+1):
         c = TaylorSeriesCoef(i,max_order_of_accuracy,'df')
         n = n +1
         coef = coef - c*lhs_coefficient[n]
-	
+
     # search for the max non-zero term
     for i in range(0,max_order_of_accuracy+1):
     	if np.abs(coef[i]) > 1.e-12:
