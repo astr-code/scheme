@@ -5,47 +5,60 @@ import spectra as sp
 
 class fdm_scheme(object):
     
-    def __init__(self,first_node,last_node,coefficient_lhs,coefficient_rhs,form):
+    def __init__(self,lhs_stencil,lhs_coefficient,rhs_stencil,rhs_coefficient):
 
-        self.form = form
+        if (lhs_stencil != 0).any():
+            self.form = 'compact'
+        else:
+            self.form = 'explicit'
 
-        if self.form == 'compact':
-            self.lhs_stencil   = np.array([-1, 0, 1])
-        elif self.form == 'explicit':
-            self.lhs_stencil   = np.array([0])
+        self.lhs_stencil       = lhs_stencil
+        self.rhs_stencil       = rhs_stencil
 
-        self.first_node        = first_node
-        self.last_node         = last_node
-        self.length_of_stencil = last_node-first_node+1
-        self.coefficient_lhs   = coefficient_lhs
-        self.coefficient_rhs   = coefficient_rhs
+        self.first_node        = self.rhs_stencil[0]
+        self.last_node         = self.rhs_stencil[-1]
+        self.length_of_stencil = self.rhs_stencil.size
+        self.rhs_coefficient   = rhs_coefficient
+        self.lhs_coefficient   = lhs_coefficient
 
-        self.rhs_stencil = np.zeros(self.length_of_stencil,dtype=np.int32)
-
-        for i in range(first_node,last_node+1):
-            self.rhs_stencil[i-first_node] = i
-        
-        self.order_of_accuracy  = ty.truncation_error_analysis(self.lhs_stencil,self.coefficient_lhs,self.rhs_stencil,self.coefficient_rhs)
+        self.order_of_accuracy  = ty.truncation_error_analysis(self.lhs_stencil,self.lhs_coefficient,self.rhs_stencil,self.rhs_coefficient)
 
     def display(self):
         # print(' length of LHS stencil:',self.length_of_stencil,type(self.length_of_stencil))
         print('')
         print(' ---------------------------------- information of the scheme ----------------------------------')
         print('           LHS stencil:',self.lhs_stencil)
-        print('       LHS coefficient:',self.coefficient_lhs)
+        print('       LHS coefficient:',self.lhs_coefficient)
         print('           RHS stencil:',self.rhs_stencil)
-        print('       RHS coefficient:',self.coefficient_rhs)
+        print('       RHS coefficient:',self.rhs_coefficient)
         print('     Order of accuracy:',self.order_of_accuracy)
 
-        if self.form == 'compact':
-            print('      format of scheme:',"{}{}{}{}".format(Fraction(self.coefficient_lhs[0]).limit_denominator(),'*df(i-1) + df(i) + ',Fraction(self.coefficient_lhs[2]).limit_denominator(),'*df(i+1) = ')) 
-        elif self.form == 'explicit':
-            print('      format of scheme: df(i)=') 
 
+        j = -1
+        for i in self.lhs_stencil:
+            j = j+1
+            if self.lhs_coefficient[j] > 0.0:
+                char1='+'
+                if j==0:
+                    char1=''
+            else:
+                char1=''
+            
+            if i > 0:
+                char2='*df(i+'+str(i)+')'
+            elif i == 0:
+                char2='*df(i)'
+            else:
+                char2='*df(i'+str(i)+')'
+            
+            print(char1,"{}{}".format(Fraction(self.lhs_coefficient[j]).limit_denominator(),char2),end='')
+
+        print(' = ',end='')
+        
         j = -1
         for i in range(self.first_node,self.last_node+1):
             j = j+1
-            if self.coefficient_rhs[j] > 0.0:
+            if self.rhs_coefficient[j] > 0.0:
                 char1='+'
             else:
                 char1=''
@@ -57,11 +70,11 @@ class fdm_scheme(object):
             else:
                 char2='*f(i'+str(i)+')'
             
-            print(char1,"{}{}".format(Fraction(self.coefficient_rhs[j]).limit_denominator(),char2),end='')
+            print(char1,"{}{}".format(Fraction(self.rhs_coefficient[j]).limit_denominator(),char2),end='')
         print('')
         print(' ----------------------------------------------------------------------------------------------')
 
     def spectra_property(self):
-        self.wavenumber,self.modified_wavenumber_real,self.modified_wavenumber_imag = sp.spectral_analyis(self.lhs_stencil,self.coefficient_lhs,self.rhs_stencil,self.coefficient_rhs)
+        self.wavenumber,self.modified_wavenumber_real,self.modified_wavenumber_imag = sp.spectral_analyis(self.lhs_stencil,self.lhs_coefficient,self.rhs_stencil,self.rhs_coefficient)
         # c = np.savetxt('spectra.txt', wavenumer, self.modified_wavenumber_real,delimiter =', ') 
         # print(wavenumer,self.modified_wavenumber_real,self.modified_wavenumber_imag)
