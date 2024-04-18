@@ -4,14 +4,6 @@ import scheme_class as sc
 import taylor as ty
 import plot_scheme as ps
 
-# def Factorial(n): # return factorial
-#     result = 1
-#     for i in range (1,n+1):
-#         result = result * i
-#     # print( "factorial is ",result)
-#     return result
-
-# the function is to derive fdm scheme with free parameters
 # giving the stencil and the required order of accuracy
 def scheme_derive_parameter(first_node_left,last_node_left,first_node_right,last_node_right,order_of_accuracy):
 	
@@ -105,9 +97,6 @@ def scheme_analysis_standard(order_of_accuracy,form):
 	ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
 	ps.plot_wavenumber(scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
 
-	# np.savetxt('myfile.dat', np.c_[scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag])
-
-	# WaveMK=spectral_analyis(rhs,lrh)
 
 # the function is to derive the standard scheme by giving the stencil
 def scheme_analysis_stencil(lhs_stencil,rhs_stencil):
