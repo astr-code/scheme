@@ -165,8 +165,9 @@ def scheme_analysis_stencil(lhs_stencil,rhs_stencil):
 	
 	scheme=sc.fdm_scheme(lhs_stencil,lhs,rhs_stencil,rhs)
 	scheme.display()
+	formula = scheme.get_formula()
 	scheme.spectra_property()
 
-	filename='modified_wavenumber_stanadard_'+form+'_'+str(order_of_accuracy)+'.dat'
-	ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
-	ps.plot_wavenumber(scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
+	# filename='modified_wavenumber_stanadard_'+form+'_'+str(order_of_accuracy)+'.dat'
+	# ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
+	ps.plot_wavenumber(scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag,formula)

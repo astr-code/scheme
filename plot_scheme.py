@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 import csv
 
 
-def plot_wavenumber(k,mkr,mki):
+def plot_wavenumber(k,mkr,mki,formula):
+
+	equation = r'$'+formula+'$'
+	plt.title(equation)
+
 	plt.plot(k,k, color="grey", linewidth=0.5, linestyle="-", label="exact")
 	plt.plot(k,mkr, color="red", linewidth=1.5, linestyle="-", label="real")
 	plt.plot(k,mki, color="blue", linewidth=1.5, linestyle="-", label="image")
