@@ -93,6 +93,58 @@ class fdm_scheme(object):
         print('')
         print(' ----------------------------------------------------------------------------------------------')
 
+        j = -1
+        for i in self.lhs_stencil:
+            j = j+1
+            if self.lhs_coefficient[j] > 0.0:
+                char1='+'
+                if j==0:
+                    char1=''
+            else:
+                char1=''
+            
+            if i > 0:
+                char2='*f(i+'+str(i)+'/2)'
+            elif i == 0:
+                char2='*f(i)'
+            else:
+                char2='*f(i'+str(i)+'/2)'
+            
+            print(char1,"{}{}".format(Fraction(self.lhs_coefficient[j]).limit_denominator(),char2),end='')
+
+        print(' = ',end='')
+
+        flux_coefficient = np.zeros([len(self.rhs_coefficient)-1], dtype = float)
+
+        for j in range(0,len(flux_coefficient)):
+
+            if j==0 :
+                flux_coefficient[j] = -self.rhs_coefficient[j]
+            else:
+                flux_coefficient[j] = flux_coefficient[j-1] - self.rhs_coefficient[j]
+
+        j = -1
+        for i in range(self.first_node+1,self.last_node+1):
+            j = j+1
+            if flux_coefficient[j] > 0.0:
+                char1='+'
+            else:
+                char1=''
+            
+            if i > 0:
+                char2='*f(i+'+str(i)+')'
+            elif i == 0:
+                char2='*f(i)'
+            else:
+                char2='*f(i'+str(i)+')'
+            
+            print(char1,"{}{}".format(Fraction(flux_coefficient[j]).limit_denominator(),char2),end='')
+
+        print('')
+        print(' ----------------------------------------------------------------------------------------------')
+
+        # print(len(self.rhs_coefficient),self.rhs_coefficient)
+
     def get_formula(self):
 
         j = -1
