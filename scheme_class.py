@@ -104,15 +104,17 @@ class fdm_scheme(object):
                 char1=''
             
             if i > 0:
-                char2='*f(i+'+str(i)+'/2)'
+                char2='*f(i+'+str(i*2+1)+'/2)'
             elif i == 0:
-                char2='*f(i)'
+                char2='*f(i+1/2)'
             else:
-                char2='*f(i'+str(i)+'/2)'
+                char2='*f(i'+str(i*2+1)+'/2)'
             
             print(char1,"{}{}".format(Fraction(self.lhs_coefficient[j]).limit_denominator(),char2),end='')
 
         print(' = ',end='')
+
+        # calculate flux form at i+1/2
 
         flux_coefficient = np.zeros([len(self.rhs_coefficient)-1], dtype = float)
 
