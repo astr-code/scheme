@@ -24,3 +24,21 @@ def file_write_wavenumber(filename,k,mkr,mki):
 		for n in range(0,len(k)):
 			print("{:.12E}  {:.12E}  {:.12E}".format(k[n],mkr[n],mki[n]),file=f)
 	print(' << ',filename)
+
+
+def plot_wavenumber_filter(k,mkr,mki,formula):
+
+	equation = r'$'+formula+'$'
+	plt.title(equation)
+
+	plt.text(0.05, 1.1, r'$\alpha = 0.49$', fontsize=14)  
+
+	plt.plot(k,mkr, color="red", linewidth=1.5, linestyle="-", label="real")
+	plt.plot(k,mki, color="blue", linewidth=1.5, linestyle="-", label="image")
+	plt.legend()
+	plt.xlabel('wavenumber')
+	plt.xlim(0, np.pi)
+	plt.ylabel('spectral function')
+	plt.ylim(-0.2, 1.2)
+	plt.axhline(linewidth=0.5, color='black')
+	plt.show()

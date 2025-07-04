@@ -168,6 +168,111 @@ def scheme_analysis_stencil(lhs_stencil,rhs_stencil):
 	formula = scheme.get_formula()
 	scheme.spectra_property()
 
-	# filename='modified_wavenumber_stanadard_'+form+'_'+str(order_of_accuracy)+'.dat'
-	# ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
+	filename='modified_wavenumber_stanadard_'+form+'_'+str(order_of_accuracy)+'.dat'
+	ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
 	ps.plot_wavenumber(scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag,formula)
+
+
+# the function is to derive the standard scheme by giving the stencil
+def filter_analysis_stencil(lhs_stencil,rhs_stencil):
+
+	left_length  = lhs_stencil.size
+	right_length = rhs_stencil.size
+
+	order_of_accuracy = right_length  - 1
+
+	print(' order of filter:',order_of_accuracy)
+
+	rhs_coef=np.zeros([right_length], dtype = float)
+
+	lhs_taylor_coef= np.zeros([left_length,order_of_accuracy+1], dtype = float) 
+	rhs_taylor_coef= np.zeros([right_length,order_of_accuracy+1], dtype = float)
+
+	# ax=b
+	b= np.zeros([right_length], dtype = float)
+	a= np.zeros([right_length,right_length], dtype = float)
+
+	first_node_stencil = rhs_stencil[0]
+	last_node_stencil  = rhs_stencil[-1]
+
+	first_node_left = lhs_stencil[0]
+	last_node_left  = lhs_stencil[-1]
+
+	alpha = np.zeros([left_length], dtype = float)
+
+
+	j=-1
+	for n in range(first_node_left,last_node_left+1):
+		j=j+1
+		lhs_taylor_coef[j,:] = ty.TaylorSeriesCoef(n,order_of_accuracy ,'f')
+
+	j=-1
+	for n in range(first_node_stencil,last_node_stencil+1):
+		j=j+1
+		rhs_taylor_coef[j,:] = ty.TaylorSeriesCoef(n,order_of_accuracy ,'f')
+
+	# RHS martix, i.e. a
+	k=-1
+	for n in range(first_node_stencil,last_node_stencil+1):
+		k=k+1
+		for j in range(0,order_of_accuracy):
+			a[j,k] = rhs_taylor_coef[k,j]
+		
+		a[j+1,k] = np.cos(n*np.pi)
+		# print(n,a[j+1,k])
+		# wave condition
+
+	j=-1
+	for n in range(first_node_left,last_node_left+1):
+		j=j+1
+		if n == 0:
+			alpha[j]=1.0
+
+	# LHS vecor, i.e. b
+	for j in range(0,order_of_accuracy):
+		k=-1
+		for n in range(first_node_left,last_node_left+1):
+			k=k+1
+			b[j] = b[j] + lhs_taylor_coef[k,j] * alpha[k]
+			# print(lhs_taylor_coef[k,:],k,alpha[k])
+			# print(j,':',b[j],lhs_taylor_coef[k,:],k,alpha[k])
+	# print(a,b)
+	rhs_coef = np.matmul(np.linalg.inv(a), b)
+	print(rhs_coef)
+
+
+	rhs_coef2=np.zeros([right_length], dtype = float)
+
+	j=-1
+	for n in range(first_node_left,last_node_left+1):
+		j=j+1
+		if n == 0:
+			alpha[j]=0.0
+		if n == -1:
+			alpha[j]=1.0
+		if n == 1:
+			alpha[j]=1.0
+
+	# LHS vecor, i.e. b
+	b[:]=0.0
+	for j in range(0,order_of_accuracy):
+		k=-1
+		for n in range(first_node_left,last_node_left+1):
+			k=k+1
+			b[j] = b[j] + lhs_taylor_coef[k,j] * alpha[k]
+	rhs_coef2 = np.matmul(np.linalg.inv(a), b)
+
+	print(rhs_coef2)
+
+	scheme=sc.filter_scheme(lhs_stencil,alpha,rhs_stencil,rhs_coef,rhs_coef2)
+
+	scheme.display()
+
+	scheme.spectra_property()
+
+	formula = scheme.get_formula()
+
+	filename='SF_LHS_'+str(first_node_left)+'~'+str(last_node_left)+'_RHS_'+str(first_node_stencil)+'~'+str(last_node_stencil)+'.dat'
+	ps.file_write_wavenumber(filename,scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag)
+
+	ps.plot_wavenumber_filter(scheme.wavenumber,scheme.modified_wavenumber_real,scheme.modified_wavenumber_imag,formula)

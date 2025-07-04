@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def TaylorSeriesCoef(delta,n,char):
 
@@ -6,7 +7,7 @@ def TaylorSeriesCoef(delta,n,char):
 
 	if char == 'f':
 		for i in range(0,n+1):
-			c[i] = np.power(delta,i)/np.math.factorial(i)
+			c[i] = np.power(delta,i)/math.factorial(i)
 		# for i in c:
 		# 	print(Fraction(i)),
 		# i=n+1
@@ -14,7 +15,7 @@ def TaylorSeriesCoef(delta,n,char):
 	elif char == 'df':
 		c[0] = 0
 		for i in range(1,n+1):
-			c[i] = np.power(delta,i-1)/np.math.factorial(i-1)
+			c[i] = np.power(delta,i-1)/math.factorial(i-1)
 	else:
 		print(" error in TaylorSeriesCoef",char)
 		quit()

@@ -1,5 +1,7 @@
 import fdm as fdm
+
 import numpy as np
+import argparse
 
 def generate_consecutive_array(first, last):
     return list(range(first, last + 1))
@@ -16,7 +18,6 @@ def scheme_analysis():
 	number_2    = int(input())
 	rhs_stencil = generate_consecutive_array(number_1,number_2)
 	rhs_stencil = np.array(rhs_stencil)
-
 
 	print(" >> The first node of the R.H.S. stencil:  ", end='')
 	number_1    = int(input())
@@ -40,8 +41,37 @@ def scheme_derive():
 	fdm.scheme_derive_parameter(first_node_left,last_node_left,first_node_right,last_node_right,order_of_accuracy)
 # this is to show the scheme definition:
 
+def filter_analysis():
+	print( "   You are analysing a filter scheme through giving a set of stencils **")
+	print( "     A sfilter cheme should have a L.H.S stencil and a R.H.S. stencil **")
+	print( "     First you need to input the range of the stencils, **")
+	print( "       for example, for a stencil ranging from i-1 to i+2, you need to first input -1, and then input 1")
+	print(" >> The first node of the L.H.S. stencil:  ", end='')
+
+	number_1    = int(input())
+	print(" >> The last node of the L.H.S. stencil:  ", end='')
+	number_2    = int(input())
+	lhs_stencil = generate_consecutive_array(number_1,number_2)
+	lhs_stencil = np.array(lhs_stencil)
+
+	print(" >> The first node of the R.H.S. stencil:  ", end='')
+	number_1    = int(input())
+	print(" >> The last node of the R.H.S. stencil:  ", end='')
+	number_2    = int(input())
+	rhs_stencil = generate_consecutive_array(number_1,number_2)
+	rhs_stencil = np.array(rhs_stencil)
+
+	fdm.filter_analysis_stencil(lhs_stencil,rhs_stencil)
+
 def main():
-	scheme_analysis()
+	mode = input("Select analysis mode [[f]ilter/[d]erivative]: ").strip().lower()
+
+	if mode == "f":
+		filter_analysis()
+	elif mode == "d":
+		scheme_analysis()
+	else:
+		print("Invalid input. Please enter 'filter' or 'derivative'.")
 
 if __name__ == '__main__':
 	main()
